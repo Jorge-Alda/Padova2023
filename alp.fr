@@ -1,0 +1,115 @@
+
+(* ************************** *)
+(* *****  Information   ***** *)
+(* ************************** *)
+M$ModelName = "ALP";
+
+M$Information = {
+  Authors      -> {"J. Alda, W. A. M. Guerrera, S. Penaranda, S. Rigolin"},
+  Version      -> "1",
+  Date         -> "26.05.2023",
+  Emails -> {"jalda@unizar.es"}
+};
+
+FeynmanGauge = False;
+
+
+(* ************************** *)
+(* *****    Indices     ***** *)
+(* ************************** *)
+
+IndexRange[Index[SU2W      ]] = Unfold[Range[3]]; 
+IndexRange[Index[SU2D      ]] = Unfold[Range[2]];
+IndexRange[Index[Gluon     ]] = NoUnfold[Range[8]];
+IndexRange[Index[Colour    ]] = NoUnfold[Range[3]]; 
+IndexRange[Index[Generation]] = Range[3];
+
+IndexStyle[SU2W,       j];
+IndexStyle[SU2D,       k];
+IndexStyle[Gluon,      a];
+IndexStyle[Colour,     m];
+IndexStyle[Generation, f];
+
+
+
+(* ************************** *)
+(* **** Particle classes **** *)
+(* ************************** *)
+M$ClassesDescription = {
+
+(* ALP *)
+
+    S[4] == {
+    ClassName-> ALP,
+    SelfConjugate    -> True,
+    Mass             -> {Ma, 0.001},  (* default ALP mass: 1 MeV *)
+    Width            -> 0, 
+    PropagatorLabel  -> "ax",
+    PropagatorType   -> D,
+    PropagatorArrow  -> None,
+    ParticleName     -> "ax",
+    FullName         -> "ALP"
+  }
+
+  };
+
+
+(* ************************** *)
+(* *****   Parameters   ***** *)
+(* ************************** *)
+M$Parameters = {
+
+(* ALP suppression scale. Default: 1 TeV *)
+
+  fa == {
+    ParameterType    -> External,
+    BlockName	     -> ALPPARS,
+    ComplexParameter -> False,
+    Value	     -> 1000,
+    TeX		     -> Subscript[f,a],
+    Description	     -> "ALP scale"
+  },
+
+(* ALP couplings *)
+(* Important: gaff stands for mf gaff*)
+
+
+  gabb == {
+    ParameterType    -> External,
+    BlockName	     -> ALPPARS,
+    Value	     -> 1.,
+    InteractionOrder -> {NP, 1},
+    ComplexParameter -> False,
+    TeX		     -> Subscript[g,abb]
+  },
+
+  gacc == {
+    ParameterType    -> External,
+    BlockName	     -> ALPPARS,
+    Value	     -> 1.,
+    InteractionOrder -> {NP, 1},
+    ComplexParameter -> False,
+    TeX		     -> Subscript[g,acc]
+  },
+
+  gall == {
+    ParameterType    -> External,
+    BlockName	     -> ALPPARS,
+    Value	     -> 1.,
+    InteractionOrder -> {NP, 1},
+    ComplexParameter -> False,
+    TeX		     -> Subscript[g,all]
+  }
+
+  };
+
+(* ************************** *)
+(* *****   Lagrangian   ***** *)
+(* ************************** *)
+
+LAlp0 := Block[{mu}, 1/2 del[ALP,mu].del[ALP,mu] - Ma^2/2 ALP^2];
+
+LAlp1 := Block[{sp1, sp2, ff, aa}, gabb ALP dqbar[sp1, ff, aa].Ga[5, sp1, sp2].dq[sp2, ff, aa] + gacc ALP  uqbar[sp1, ff, aa].Ga[5, sp1, sp2].uq[sp2, ff, aa] + gall ALP lbar[sp1, ff].Ga[5, sp1, sp2].l[sp2, ff]];
+
+LALP := LAlp0 + LAlp1;
+
